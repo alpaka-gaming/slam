@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".files", ".files", "{EBFBE9EC-8BBE-4080-86F3-201E68268029}"
+ProjectSection(SolutionItems) = preProject
+	.editorconfig = .editorconfig
+	.gitattributes = .gitattributes
+	.gitignore = .gitignore
+	CHANGELOG.md = CHANGELOG.md
+	LICENSE = LICENSE
+	README.md = README.md
+	.editoricon.png = .editoricon.png
+	build.cake = build.cake
+	src\.files\AssemblyInfo.General.cs = src\.files\AssemblyInfo.General.cs
+	src\.files\AssemblyInfo.Version.cs = src\.files\AssemblyInfo.Version.cs
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{B0F8AC6D-88B6-4981-8987-AB4B0635482F}"
+	ProjectSection(SolutionItems) = preProject
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".workflows", ".workflows", "{218BDA05-D55C-49DC-80F4-71B7AA3C07A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A3FE360B-E0E9-470A-B0A3-87E1B6E3B415}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D4673DF9-2E71-4450-8099-E05AA6DD6183}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Abstractions", "tests\Tests.Abstractions\Tests.Abstractions.csproj", "{293AB7D0-1FD6-48FD-B699-DAF5AD41EF31}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{D5DD9FFE-68B1-49AD-84DB-8394731BCA7E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "src\Core\Core.csproj", "{A3270E1D-4EE4-41E5-A6B9-DA49E460D84C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shell", "src\Shell\Shell.csproj", "{9817FBA0-B0C5-4E76-9191-482904343A97}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{293AB7D0-1FD6-48FD-B699-DAF5AD41EF31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{293AB7D0-1FD6-48FD-B699-DAF5AD41EF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{293AB7D0-1FD6-48FD-B699-DAF5AD41EF31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{293AB7D0-1FD6-48FD-B699-DAF5AD41EF31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3270E1D-4EE4-41E5-A6B9-DA49E460D84C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3270E1D-4EE4-41E5-A6B9-DA49E460D84C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3270E1D-4EE4-41E5-A6B9-DA49E460D84C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3270E1D-4EE4-41E5-A6B9-DA49E460D84C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9817FBA0-B0C5-4E76-9191-482904343A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9817FBA0-B0C5-4E76-9191-482904343A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9817FBA0-B0C5-4E76-9191-482904343A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9817FBA0-B0C5-4E76-9191-482904343A97}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{293AB7D0-1FD6-48FD-B699-DAF5AD41EF31} = {D4673DF9-2E71-4450-8099-E05AA6DD6183}
+		{D5DD9FFE-68B1-49AD-84DB-8394731BCA7E} = {218BDA05-D55C-49DC-80F4-71B7AA3C07A2}
+		{A3270E1D-4EE4-41E5-A6B9-DA49E460D84C} = {A3FE360B-E0E9-470A-B0A3-87E1B6E3B415}
+		{9817FBA0-B0C5-4E76-9191-482904343A97} = {A3FE360B-E0E9-470A-B0A3-87E1B6E3B415}
+	EndGlobalSection
+EndGlobal
