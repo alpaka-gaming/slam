@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Entities
 {
-    internal class GameSetup : ICloneable, INotifyPropertyChanged
+    internal class GameSetup : ICloneable
     {
         public GameSetup()
         {
@@ -26,7 +26,7 @@ namespace Core.Entities
             return new GameSetup(this);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyChangedEventHandler PropertyChanged;
 
         public string Name { get; set; }
         public Engines Engine { get; set; }

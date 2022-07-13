@@ -20,6 +20,10 @@
 
   <ItemGroup>
     <PackageReference Include="Facepunch.Steamworks" Version="2.3.3" />
+    <PackageReference Include="Gameloop.Vdf" Version="0.6.2" />
+    <PackageReference Include="Gameloop.Vdf.JsonConverter" Version="0.2.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="ValveResourceFormat" Version="0.2.1.963" />
   </ItemGroup>
 
 </Project>

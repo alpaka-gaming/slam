@@ -4,8 +4,10 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
@@ -18,9 +20,7 @@ namespace Shell
         internal static Assembly Assembly = Assembly.GetExecutingAssembly();
 
         internal static IConfiguration Configuration { get; private set; }
-        internal static ServiceCollection Services { get; private set; }
-        internal static ServiceProvider Container { get; private set; }
-
+        internal static IServiceProvider Container { get; private set; }
         internal static HttpClient HttpClient { get; private set; }
 
         private static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
@@ -32,56 +32,77 @@ namespace Shell
         [STAThread]
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += UnhandledException;
-
-            Configuration = new ConfigurationBuilder()
-                //.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, true)
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            NewInstance += OnNewInstance;
+            
+            if (IsNewInstance)
+            {
+                // Configurations
+                Configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", false, true)
 #if DEBUG
-                .AddJsonFile("appsettings.Development.json", true, true)
+                    .AddJsonFile("appsettings.Development.json", true, true)
 #endif
-                .AddEnvironmentVariables()
-                .AddCommandLine(args)
-                .Build();
+                    .AddEnvironmentVariables()
+                    .AddCommandLine(args)
+                    .Build();
 
-            HttpClient = new HttpClient();
+                // HttpClient
+                HttpClient = new HttpClient();
 
-            // Initialize Logger
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .CreateLogger();
+                // Initialize Logger
+                Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(Configuration)
+                    .CreateLogger();
 
-            Services = new ServiceCollection();
+                Application.SetHighDpiMode(HighDpiMode.SystemAware);
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            Services.AddSingleton(Configuration);
-            Services.AddLogging(builder =>
-            {
-                builder.SetMinimumLevel(LogLevel.Information);
-                builder.AddSerilog();
-            }).AddOptions();
+                Container = CreateHostBuilder().Build().Services;
 
-            Container = Services.BuildServiceProvider();
-
-            try
-            {
-                Log.Information("Application Starting");
-                // To customize application configuration such as set high DPI settings or default font,
-                // see https://aka.ms/applicationconfiguration.
-                ApplicationConfiguration.Initialize();
-                if (IsNewInstance)
-                    Application.Run(new FormMain());
-                else
-                    NewInstanceHandler(null, EventArgs.Empty);
+                try
+                {
+                    Log.Information("Application Starting");
+                    // To customize application configuration such as set high DPI settings or default font,
+                    // see https://aka.ms/applicationconfiguration.
+                    ApplicationConfiguration.Initialize();
+                    Application.Run(Container.GetRequiredService<FormMain>());
+                }
+                catch (Exception e)
+                {
+                    Log.Fatal(e, "The Application failed to start");
+                    throw;
+                }
+                finally
+                {
+                    Log.CloseAndFlush();
+                }
             }
-            catch (Exception e)
+            else
             {
-                Log.Fatal(e, "The Application failed to start");
-                throw;
+                NewInstanceHandler(null, EventArgs.Empty);
             }
-            finally
+        }
+
+        private static IHostBuilder CreateHostBuilder()
+        {
+            var builder = Host.CreateDefaultBuilder().ConfigureServices((context, services) =>
             {
-                Log.CloseAndFlush();
-            }
+                services.AddSingleton(HttpClient);
+                services.AddSingleton(Configuration);
+                services.AddLogging(builder =>
+                {
+                    builder.SetMinimumLevel(LogLevel.Information);
+                    builder.AddSerilog();
+                }).AddOptions();
+
+                services.AddCore();
+                services.AddTransient<FormMain>();
+            });
+
+            return builder;
         }
 
         private static void NewInstanceHandler(object sender, EventArgs e)
@@ -91,7 +112,7 @@ namespace Shell
 
         public static event EventHandler NewInstance;
 
-        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = (Exception)e.ExceptionObject;
 
@@ -106,6 +127,11 @@ namespace Shell
                 Console.WriteLine(ex.Message);
                 Console.ResetColor();
             }
+        }
+
+        private static void OnNewInstance(object sender, EventArgs e)
+        {
+            //TODO:
         }
     }
 }
