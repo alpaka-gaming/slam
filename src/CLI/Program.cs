@@ -8,6 +8,7 @@ using System.Resources;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Core;
+using Core.Models;
 using Core.Services;
 using GitHub;
 using Microsoft.Extensions.Configuration;
@@ -82,9 +83,8 @@ namespace CLI
         [STAThread]
         public static void Main(string[] args)
         {
-
             PrintHeader();
-            
+
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             GitHub.GitHubInfo.NewUpdate += NewVersion;
 
@@ -136,14 +136,28 @@ namespace CLI
                 PrintHelp();
                 return;
             }
-            
+
             if (!NoUpdate) await CheckForUpdatesAsync();
 
             var steamService = Container.GetService<SteamService>();
             var folders = steamService.GetLibraryFolders();
+            var appIds = new List<long>();
+            Configuration.Bind("AppIds", appIds);
+
+            var appPaths = new Dictionary<long, Definition>();
             foreach (var libraryFolder in folders)
             {
+                if (libraryFolder.Apps.Any(m => appIds.Contains(m.Key)))
+                {
+                    var apps = libraryFolder.Apps.Where(m => appIds.Contains(m.Key));
+                    foreach (var app in apps)
+                    {
+                        var definition = steamService.GetAppDefinition(app.Key);
+                        appPaths.Add(app.Key, definition);
+                    }
+                }
             }
+
         }
 
         private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
