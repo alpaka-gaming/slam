@@ -15,6 +15,12 @@ namespace Shell
             _steamService = steamService;
         }
 
+        protected override async void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            await Program.CheckForUpdatesAsync();
+        }
+
         protected override void OnShown(EventArgs e)
         {
             //var gamelist = _steamService.GetSteamInstallPath();
@@ -23,5 +29,4 @@ namespace Shell
             base.OnShown(e);
         }
     }
-
 }

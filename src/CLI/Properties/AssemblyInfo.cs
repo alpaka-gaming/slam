@@ -1,13 +1,12 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using GitHub;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Core")]
-[assembly: AssemblyDescription("Core Layer")]
+[assembly: AssemblyTitle("Shell")]
+[assembly: AssemblyDescription("Shell Layer")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 // [assembly: Guid("00000000-0000-0000-0000-000000000000")]
@@ -17,5 +16,3 @@ using GitHub;
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// GitHub
-[assembly: GitHub("alpaka-gaming", "slam")]

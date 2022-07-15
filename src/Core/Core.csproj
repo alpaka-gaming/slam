@@ -5,6 +5,7 @@
     <LangVersion>default</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
+    <AssemblyName>Slam.Core</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,19 @@
     <PackageReference Include="Gameloop.Vdf.JsonConverter" Version="0.2.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="ValveResourceFormat" Version="0.2.1.963" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="References\GitHub.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>GitHub.Designer.cs</LastGenOutput>
+      <DependentUpon>GitHub.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Update="References\GitHub.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GitHub.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

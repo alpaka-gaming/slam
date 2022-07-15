@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Resources;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Core;
+using GitHub;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,8 +38,9 @@ namespace Shell
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            GitHub.GitHubInfo.NewUpdate += NewVersion;
             NewInstance += OnNewInstance;
-            
+
             if (IsNewInstance)
             {
                 // Configurations
@@ -65,6 +71,7 @@ namespace Shell
                 try
                 {
                     Log.Information("Application Starting");
+
                     // To customize application configuration such as set high DPI settings or default font,
                     // see https://aka.ms/applicationconfiguration.
                     ApplicationConfiguration.Initialize();
@@ -80,6 +87,7 @@ namespace Shell
                     Log.CloseAndFlush();
                 }
             }
+
             else
             {
                 NewInstanceHandler(null, EventArgs.Empty);
@@ -132,6 +140,33 @@ namespace Shell
         private static void OnNewInstance(object sender, EventArgs e)
         {
             //TODO:
+        }
+
+        public static async Task CheckForUpdatesAsync()
+        {
+            await GitHub.GitHubInfo.CheckForUpdateAsync();
+        }
+        
+        private static void NewVersion(object sender, EventArgs e)
+        {
+            var s_resourceManager = new ResourceManager("GitHub", typeof(GitHub.GitHubInfo).Assembly);
+            var updateMessage = s_resourceManager.GetString("NewVersion");
+            if (updateMessage != null)
+            {
+                updateMessage = updateMessage.Replace("{VERSION}", GitHub.GitHubInfo.LatestGitHubRelease.GetVersion().ToString());
+                updateMessage = updateMessage.Replace("{CREATEDAT}", GitHub.GitHubInfo.LatestGitHubRelease.CreatedAt.UtcDateTime.ToShortDateString());
+                if (MessageBox.Show(updateMessage, ApplicationInfo.Title, MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    var assetName = GitHubInfo.AssetName;
+                    if (string.IsNullOrEmpty(assetName)) assetName = $"{ApplicationInfo.Product}.zip";
+                    var assetUrl = GitHub.GitHubInfo.LatestGitHubRelease.Assets.FirstOrDefault(m => m.Name == assetName);
+                    var url = GitHub.GitHubInfo.LatestGitHubRelease.AssetsUrl;
+                    if (assetUrl != null) url = assetUrl.BrowserDownloadUrl;
+                    if (string.IsNullOrEmpty(url)) url = GitHubInfo.Repo;
+                    if (!string.IsNullOrEmpty(url)) Process.Start(url);
+                }
+            }
         }
     }
 }
