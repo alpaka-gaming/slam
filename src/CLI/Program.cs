@@ -38,11 +38,11 @@ namespace CLI
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
-            
+
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
-            
+
             var services = new ServiceCollection();
             services.AddSingleton(Configuration);
             services.AddLogging(builder =>
@@ -50,11 +50,11 @@ namespace CLI
                 builder.SetMinimumLevel(LogLevel.Information);
                 builder.AddSerilog();
             }).AddOptions();
-            
+
             services.AddCore();
-            
+
             Container = services.BuildServiceProvider();
-            
+
             // Arguments
             _arguments = new Dictionary<string, string>();
             var assembly = Assembly.GetExecutingAssembly().Location;
@@ -64,15 +64,17 @@ namespace CLI
 
             foreach (var item in args.Where(m => m != assembly))
             {
-                var regex = Regex.Match(item, @"^(?:\/|-)(\w+):?(.+)?$");
+                var regex = Regex.Match(item, @"^(?:\/|--|-)(.*):?(.+)?$", RegexOptions.Compiled);
                 if (regex.Success)
                     _arguments.Add(regex.Groups[1].Value, regex.Groups[2].Value);
             }
-
         }
-        
+
         private static Dictionary<string, string> _arguments;
         private static ResourceManager _resourceManager;
+
+        public static bool ShowHelp => _arguments.ContainsKey("help");
+        public static bool NoUpdate => _arguments.ContainsKey("no-update");
 
         /// <summary>
         ///  The main entry point for the application.
@@ -80,24 +82,27 @@ namespace CLI
         [STAThread]
         public static void Main(string[] args)
         {
+
+            PrintHeader();
+            
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             GitHub.GitHubInfo.NewUpdate += NewVersion;
-            
+
             _resourceManager = new ResourceManager("CLI.Resources.Strings", typeof(CLI.Resources.Strings).Assembly);
-            
+
 #if DEBUG
             System.Console.WriteLine(_resourceManager.GetString("PressAnyKey"));
             System.Console.ReadKey();
             System.Console.Clear();
 #endif
-            
+
             Initialize(args);
 
             // if (_arguments.Count < 3)
             // {
             //     throw new InvalidProgramException(_resourceManager.GetString("InvalidArguments"));
             // }
-         
+
             var key = ConsoleKey.Enter;
             while (key != ConsoleKey.Escape)
             {
@@ -112,20 +117,33 @@ namespace CLI
 
                 key = System.Console.ReadKey().Key;
             }
-            
+        }
+
+        private static void PrintHeader()
+        {
+            Console.WriteLine($"{Name} CLI v{Version}");
+        }
+
+        private static void PrintHelp()
+        {
+            //TODO:
         }
 
         private static async Task MainAsync(string[] args)
         {
-            await CheckForUpdatesAsync();
+            if (ShowHelp)
+            {
+                PrintHelp();
+                return;
+            }
+            
+            if (!NoUpdate) await CheckForUpdatesAsync();
 
             var steamService = Container.GetService<SteamService>();
             var folders = steamService.GetLibraryFolders();
             foreach (var libraryFolder in folders)
             {
-                
             }
-
         }
 
         private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
